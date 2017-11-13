@@ -10,7 +10,13 @@ import Modal from 'react-modal/lib/index';
 Modal.setAppElement(document.getElementById('react-root'));
 
 import HTTPHeaderEditor from './HTTPHeaderEditor';
+import OauthCredentialsEditor from './OauthCredentialsEditor';
 
+// TODO for Oauth2 support - rough plan:
+// add a new button like Edit Headers for entering credentials
+// create editor for entering client ID, secret, credentials, token URLs. Save that in the same way headers are saved.
+// work out how to use that info to request or re-use an oauth2 access token each time a request is made.
+// it will probably mean adding/overwriting the Bearer header in the existing headers structure
 
 export default class App extends React.Component {
   constructor() {
@@ -259,9 +265,21 @@ export default class App extends React.Component {
     });
   }
 
+  openOauthEdit = () => {
+    this.setState({
+      oauthEditOpen: true
+    })
+  }
+
   closeModal = () => {
     this.setState({
       headerEditOpen: false
+    });
+  }
+
+  closeOauthModal = () => {
+    this.setState({
+      oauthEditOpen: false
     });
   }
 
@@ -280,6 +298,8 @@ export default class App extends React.Component {
             <div className="pure-control-group">
               <label htmlFor="endpoint">GraphQL Endpoint</label>
               <input type="text" className="pure-input-1-2" name="endpoint" value={currentTab.endpoint} onChange={this.handleChange.bind(this, 'endpoint')} placeholder="GraphQL Endpoint" />
+
+              <a href="javascript:;" className="pure-button pure-button-primary edit-headers-button" onClick={this.openOauthEdit}>Edit OAuth2 Credentials</a>
 
               <a href="javascript:;" className="pure-button pure-button-primary edit-headers-button" onClick={this.openHeaderEdit}>Edit HTTP Headers</a>
 
@@ -339,6 +359,10 @@ export default class App extends React.Component {
             headers={_.map(this.state.tabs[this.state.currentTabIndex].headers, (value, key) => ({ key, value }))}
             onCreateHeaders={this.getHeadersFromModal}
             closeModal={this.closeModal} />
+        </Modal>
+        <Modal isOpen={this.state.oauthEditOpen} onRequestClose={this.closeOauthModal}>
+          <OauthCredentialsEditor
+            closeModal={this.closeOauthModal} />
         </Modal>
       </div>
     );
