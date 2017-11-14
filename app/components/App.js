@@ -163,18 +163,15 @@ export default class App extends React.Component {
     };
 
     const error = {
-                    "data" : null,
-                    "errors": [
-                      {
-                        "message": "I couldn't communicate with the GraphQL server at the provided URL. Is it correct?"
-                      }
-                    ]
-                  };
+      "data" : null,
+      "errors": [
+        {
+          "message": "I couldn't communicate with the GraphQL server at the provided URL. Is it correct?"
+        }
+      ]
+    };
 
     const { endpoint, method, headers, oauthCredentials } = this.getCurrentTab();
-
-    console.log("oauth credentials:")
-    console.log(oauthCredentials)
 
     if (endpoint == "") {
       return Promise.resolve({
@@ -187,29 +184,86 @@ export default class App extends React.Component {
       });
     }
 
-    if (method == "get") {
-      var url = endpoint;
-      if (typeof graphQLParams['variables'] === "undefined"){
-        graphQLParams['variables'] = "{}";
-      }
+    // try to get access token from oauth credentials
+    return this.getOauthTokens(oauthCredentials)
+      .catch((reason) => {
+        console.log("failed to get oauth tokens:")
+        console.log(reason)
+      })
+      .then((tokens) => {
+        console.log("got tokens:")
+        console.log(tokens)
 
-      url += url.indexOf('?') == -1 ? "?" : "&";
+        let authHeaders = {}
+        if (tokens) {
+          authHeaders['Authorization'] = `Bearer ${tokens.token.access_token}`
+        }
 
-      return fetch(url + "query=" + encodeURIComponent(graphQLParams['query']) + "&variables=" + encodeURIComponent(JSON.stringify(graphQLParams['variables'])), {
-        method: method,
-        credentials: 'include',
-        headers: Object.assign({}, defaultHeaders, headers),
-        body: null
-      }).then(response => response.json())
-        .catch(reason => error);
-    }
-    return fetch(endpoint, {
-      method: method,
-      credentials: 'include',
-      headers: Object.assign({}, defaultHeaders, headers),
-      body: JSON.stringify(graphQLParams)
-    }).then(response => response.json())
-      .catch(reason => error);
+        let allHeaders = Object.assign({}, defaultHeaders, headers, authHeaders)
+
+        console.log('allHeaders =')
+        console.log(allHeaders)
+
+        if (method == "get") {
+          var url = endpoint;
+          if (typeof graphQLParams['variables'] === "undefined"){
+            graphQLParams['variables'] = "{}";
+          }
+
+          url += url.indexOf('?') == -1 ? "?" : "&";
+
+          return fetch(url + "query=" + encodeURIComponent(graphQLParams['query'])
+              + "&variables=" + encodeURIComponent(JSON.stringify(graphQLParams['variables'])), {
+            method: method,
+            credentials: 'include',
+            headers: allHeaders,
+            body: null
+          }).then(response => response.json())
+            .catch(reason => error);
+        }
+        return fetch(endpoint, {
+          method: method,
+          credentials: 'include',
+          headers: allHeaders,
+          body: JSON.stringify(graphQLParams)
+        }).then(response => response.json())
+          .catch(reason => error);
+      })
+  }
+
+  getOauthTokens(oauthCredentials) {
+    return new Promise((resolve, reject) => {
+      const credentials = {
+        client: {
+          id: oauthCredentials.clientId,
+          secret: oauthCredentials.clientSecret
+        },
+        auth: {
+          tokenHost: oauthCredentials.tokenHost,
+          tokenPath: oauthCredentials.tokenPath
+        },
+        options: {
+          useBodyAuth: false
+        }
+      };
+
+      // Initialize the OAuth2 Library
+      const oauth2 = require('simple-oauth2').create(credentials);
+
+      const tokenConfig = {
+        username: oauthCredentials.username,
+        password: oauthCredentials.password
+      };
+
+      oauth2.ownerPassword.getToken(tokenConfig, (error, result) => {
+        if (error) {
+          reject(error)
+        } else {
+          const tokens = oauth2.accessToken.create(result);
+          resolve(tokens)
+        }
+      });
+    });
   }
 
   handleChange(field, eOrKey, e) {

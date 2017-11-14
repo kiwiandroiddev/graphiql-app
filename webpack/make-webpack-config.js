@@ -133,11 +133,12 @@ module.exports = function(opts) {
 
   if (opts.minimize && !opts.prerender) {
     plugins.push(
-      new webpack.optimize.UglifyJsPlugin({
-        compressor: {
-          warnings: false
-        }
-      }),
+      // TODO reenable this at some point...
+      // new webpack.optimize.UglifyJsPlugin({
+      //   compressor: {
+      //     warnings: false
+      //   }
+      // }),
       new webpack.optimize.DedupePlugin()
     );
   }
