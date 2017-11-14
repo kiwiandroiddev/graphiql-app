@@ -31,6 +31,7 @@ export default class App extends React.Component {
         {
           name: null,
           headers: {},
+          oauthCredentials: {},
           endpoint: '',
           method: 'post'
         }
@@ -80,6 +81,7 @@ export default class App extends React.Component {
       tabs: [...this.state.tabs, {
         uuid: uuid.v1(),
         headers: currentTab.headers,
+        oauthCredentials: currentTab.oauthCredentials,
         endpoint: currentTab.endpoint,
         method: currentTab.method
       }],
@@ -169,7 +171,10 @@ export default class App extends React.Component {
                     ]
                   };
 
-    const { endpoint, method, headers } = this.getCurrentTab();
+    const { endpoint, method, headers, oauthCredentials } = this.getCurrentTab();
+
+    console.log("oauth credentials:")
+    console.log(oauthCredentials)
 
     if (endpoint == "") {
       return Promise.resolve({
@@ -181,8 +186,6 @@ export default class App extends React.Component {
         ]
       });
     }
-
-
 
     if (method == "get") {
       var url = endpoint;
@@ -284,7 +287,13 @@ export default class App extends React.Component {
   }
 
   getHeadersFromModal = (headers) => {
+    console.log("got headers:")
+    console.log(headers)
     this.updateFieldForTab(this.state.currentTabIndex, 'headers', headers);
+  }
+
+  getOauthCredentialsFromModal = (credentials) => {
+    this.updateFieldForTab(this.state.currentTabIndex, 'oauthCredentials', credentials);
   }
 
   render() {
@@ -362,6 +371,7 @@ export default class App extends React.Component {
         </Modal>
         <Modal isOpen={this.state.oauthEditOpen} onRequestClose={this.closeOauthModal}>
           <OauthCredentialsEditor
+            onCreateCredentials={this.getOauthCredentialsFromModal}
             closeModal={this.closeOauthModal} />
         </Modal>
       </div>
