@@ -371,7 +371,8 @@ export default class App extends React.Component {
         </Modal>
         <Modal isOpen={this.state.oauthEditOpen} onRequestClose={this.closeOauthModal}>
           <OauthCredentialsEditor
-            onCreateCredentials={this.getOauthCredentialsFromModal}
+            credentials={currentTab.oauthCredentials}
+            onUpdateCredentials={this.getOauthCredentialsFromModal}
             closeModal={this.closeOauthModal} />
         </Modal>
       </div>
