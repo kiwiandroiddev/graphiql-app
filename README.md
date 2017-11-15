@@ -24,3 +24,21 @@ Alternately, download the binary from the [Releases](https://github.com/skevy/gr
 - install all the require packages: `npm i`
 - build the project: `npm run build`
 - start the project: `npm start`
+
+#### Fork notes
+
+This fork adds OAuth2 Password grant support to GraphiQL-app (backed by [simple-oauth2](https://github.com/lelylan/simple-oauth2)).
+
+This version contains an additional button in the UI to supply:
+
+- Token Host (e.g. `https://oauthtokenserver.com`)
+- Token Path (e.g. `oauth/token`)
+- Client ID
+- Client secret
+- Username
+- Password
+
+After which all GraphQL requests will include an Authorization header with the
+access token returned from authenticating with the given credentials.
+
+If no Oauth2 credentials are given, requests will be unauthenticated, as usual.
