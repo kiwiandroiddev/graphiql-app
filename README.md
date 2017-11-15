@@ -28,7 +28,6 @@ It adds a new button and form for you to supply:
 - Username
 - Password
 
-After which all GraphQL requests will include an Authorization header with the
-access token returned from authenticating with the given credentials.
+Once these Oauth2 server details and credentials are supplied, all future GraphQL requests will automatically be authorized (i.e. the correct Authorization header will be added to requests).
 
-If no Oauth2 credentials are given, requests will default to be unauthenticated.
+GraphiQL will continue to work normally (making unauthenticated requests) if no Oauth2 credentials are supplied.
