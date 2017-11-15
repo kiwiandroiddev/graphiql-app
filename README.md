@@ -19,7 +19,7 @@ Provides a tabbed interface for editing and testing GraphQL queries/mutations wi
 
 This fork adds OAuth2 Password grant support to the app (backed by [simple-oauth2](https://github.com/lelylan/simple-oauth2)).
 
-![Screenshot of Oauth2 credentials form](/screenshots/oauth-credentials-modal.png")
+![Screenshot of Oauth2 credentials form](/screenshots/oauth-credentials-modal.png)
 
 Once these Oauth2 server details and credentials are supplied, all future GraphQL requests will automatically be authorized (i.e. the correct Authorization header will be added to requests).
 
